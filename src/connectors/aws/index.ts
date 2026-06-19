@@ -2,20 +2,7 @@ import { IEC2Connector } from '../types';
 import { InstanceMetrics } from '../../analyzers/idle_ec2';
 import { EC2Client, DescribeInstancesCommand, Instance } from '@aws-sdk/client-ec2';
 import { CloudWatchClient, GetMetricStatisticsCommand, Datapoint } from '@aws-sdk/client-cloudwatch';
-
-// On-demand pricing eu-west-3 (Paris), Linux, USD approximated in EUR
-const INSTANCE_HOURLY_COST_EUR: Record<string, number> = {
-  't3.micro': 0.0116,
-  't3.small': 0.0232,
-  't3.medium': 0.0464,
-  't3.large': 0.0928,
-  'm5.large': 0.107,
-  'm5.xlarge': 0.214,
-  'm5.2xlarge': 0.428,
-  'c5.large': 0.096,
-  'c5.xlarge': 0.192,
-  'r5.large': 0.140,
-};
+import { hourlyCostEur } from './pricing';
 
 export class AWSEC2Connector implements IEC2Connector {
   private readonly ec2: EC2Client;
@@ -32,7 +19,7 @@ export class AWSEC2Connector implements IEC2Connector {
   }
 
   getHourlyCost(instanceType: string): number {
-    return INSTANCE_HOURLY_COST_EUR[instanceType] ?? 0;
+    return hourlyCostEur(instanceType);
   }
 
   async listInstances(): Promise<InstanceMetrics[]> {
@@ -90,7 +77,7 @@ export class AWSEC2Connector implements IEC2Connector {
         cpuAveragePercent,
         networkBytesTotal: 0,
         daysObserved,
-        hourlyCostEur: this.getHourlyCost(instance.InstanceType),
+        hourlyCostEur: hourlyCostEur(instance.InstanceType),
         hasPeriodicSpikes,
       });
     }
