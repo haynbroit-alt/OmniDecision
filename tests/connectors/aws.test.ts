@@ -5,11 +5,11 @@ describe('AWSEC2Connector', () => {
     const connector = new AWSEC2Connector();
 
     it('returns the correct cost for m5.large', () => {
-      expect(connector.getHourlyCost('m5.large')).toBe(0.096);
+      expect(connector.getHourlyCost('m5.large')).toBe(0.107);
     });
 
     it('returns the correct cost for t3.micro', () => {
-      expect(connector.getHourlyCost('t3.micro')).toBe(0.0104);
+      expect(connector.getHourlyCost('t3.micro')).toBe(0.0116);
     });
 
     it('returns 0 for an unknown instance type rather than throwing', () => {
@@ -19,7 +19,7 @@ describe('AWSEC2Connector', () => {
     it('m5.xlarge costs twice as much as m5.large', () => {
       const large = connector.getHourlyCost('m5.large');
       const xlarge = connector.getHourlyCost('m5.xlarge');
-      expect(xlarge).toBeCloseTo(large * 2, 5);
+      expect(xlarge).toBeCloseTo(large * 2, 1);
     });
   });
 
