@@ -1,4 +1,19 @@
 import { AWSEC2Connector } from '../../src/connectors/aws';
+import { monthlyCostEur } from '../../src/connectors/aws/pricing';
+
+describe('monthlyCostEur', () => {
+  it('returns hourly × 24 × 30 for t3.micro', () => {
+    expect(monthlyCostEur('t3.micro')).toBeCloseTo(0.0116 * 24 * 30, 2);
+  });
+
+  it('returns hourly × 24 × 30 for m5.large', () => {
+    expect(monthlyCostEur('m5.large')).toBeCloseTo(0.107 * 24 * 30, 1);
+  });
+
+  it('returns 0 for unknown instance type', () => {
+    expect(monthlyCostEur('x99.unknown')).toBe(0);
+  });
+});
 
 describe('AWSEC2Connector', () => {
   describe('getHourlyCost', () => {

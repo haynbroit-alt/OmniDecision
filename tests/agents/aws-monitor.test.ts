@@ -116,6 +116,39 @@ describe('formatMonitorTable', () => {
     });
   });
 
+  describe('low-confidence status labels', () => {
+    it('shows "Pas de données" for a running instance with no datapoints', () => {
+      const output = formatMonitorTable(makeSummary({
+        instances: [makeStatus({ confidence: 0.1, datapointCount: 0 })],
+      }));
+      expect(output).toContain('Pas de données');
+    });
+
+    it('shows percentage and days-needed for a running instance with low confidence but existing data', () => {
+      const output = formatMonitorTable(makeSummary({
+        instances: [makeStatus({ confidence: 0.1, datapointCount: 3, ageDays: 1.5 })],
+      }));
+      expect(output).toContain('10%');
+      expect(output).toContain('besoin de');
+    });
+  });
+
+  describe('age display format', () => {
+    it('shows hours for instances younger than 1 day', () => {
+      const output = formatMonitorTable(makeSummary({
+        instances: [makeStatus({ ageDays: 0.5 })],
+      }));
+      expect(output).toContain('12h');
+    });
+
+    it('shows days for instances 1+ day old', () => {
+      const output = formatMonitorTable(makeSummary({
+        instances: [makeStatus({ ageDays: 3.0 })],
+      }));
+      expect(output).toContain('3j');
+    });
+  });
+
   describe('multiple instances', () => {
     it('renders all instances', () => {
       const summary = makeSummary({
